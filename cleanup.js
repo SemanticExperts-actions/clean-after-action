@@ -7,6 +7,7 @@ function getBoolValue(name) {
 }
 
 async function main() {
+  const errorless = getBoolValue('errorless');
   try {
     const keepGit = getBoolValue('keepGit');
     await fs.readdir('.', async (err, files) => {
@@ -22,7 +23,11 @@ async function main() {
       }
     })
   } catch (error) {
-    core.setFailed(error.message);
+    if (errorless) {
+      core.warning(error.message);
+    } else {
+      core.setFailed(error.message);
+    }
   }
 }
 
