@@ -14,23 +14,34 @@ async function main() {
 
   try {
     const keepGit = getBoolValue('keepGit');
-    await fs.readdir('.', async (err, files) => {
-      if (err) {
-        throw new Error(`Failed to list files: ${err}`);
-      }
-      for (const file of files) {
-        if (keepGit && file === '.git') {
-          continue;
-        }
-        console.log(`Deleting ${file}`);
-        await io.rmRF(file);
-      }
-    })
+    await fs.readdir('.', (err, files) => deleteFiles(err, files, keepGit, errorless));
   } catch (error) {
     if (errorless) {
       core.warning(error.message);
     } else {
       core.setFailed(error.message);
+    }
+  }
+}
+
+async function deleteFiles(err, files, keepGit = false, errorless = false) {
+  if (err) {
+    throw new Error(`Failed to list files: ${err}`);
+  }
+  for (const file of files) {
+    if (keepGit && file === '.git') {
+      continue;
+    }
+    console.log(`Deleting ${file}`);
+
+    try {
+      await io.rmRF(file);
+    } catch (error) {
+      if (errorless) {
+        console.log(`Failed to delete ${file}: ${error}`);
+      } else {
+        throw new Error(`Failed to delete ${file}: ${error}`);
+      }
     }
   }
 }
