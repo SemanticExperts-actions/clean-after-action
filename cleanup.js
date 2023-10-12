@@ -9,9 +9,6 @@ function getBoolValue(name) {
 async function main() {
   const errorless = getBoolValue('errorless');
 
-  console.log(`=====> Keep git: ${getBoolValue('keepGit')}`);
-  console.log(`=====> Errorless: ${errorless}`)
-
   try {
     const keepGit = getBoolValue('keepGit');
     await fs.readdir('.', (err, files) => deleteFiles(err, files, keepGit, errorless));
